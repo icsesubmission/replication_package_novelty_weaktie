@@ -10,12 +10,14 @@ data_network_commit = read_csv('./data/network_stats_com_Python_before_2022_mont
 data_network_issue = read_csv('./data/network_stats_com_Python_before_2022_month_12_act_issue.csv')
 data_network_star = read_csv('./data/network_stats_com_Python_before_2022_month_12_act_star.csv')
 data_meta = read_csv('./data/repo_meta_com_Python_before_2022.csv')
+data_validation = read_csv('./data/repo_validate_novelty_b_10.csv')
 
 
 
 df_project_m = merge(data_novelty, data_network_commit, by = 'repo_slug')
 df_project_m = merge(df_project_m, data_network_issue, by = 'repo_slug')
 df_project_m = merge(df_project_m, data_network_star, by = 'repo_slug')
+df_project_m = merge(df_project_m, data_validation, by = 'repo_slug')
 
 df_project_m = merge(df_project_m, data_meta, by = 'repo_slug')
 
@@ -37,13 +39,12 @@ df_project_m_diversity = subset(df_project_m_no_outlier, diversity_commit > -999
 df_project_m_diversity_no_outlier = subset(df_project_m_diversity, diversity_commit < -0.3 &
                                                                    diversity_issue < -0.15 &
                                                                    diversity_star < -0.1)
-
-
+df_project_m_diversity_no_outlier$atypicality_validation = - df_project_m_diversity_no_outlier$pk_sim_mean_valid
+# Fang's metric for validation
 
 rm(data_novelty)
 rm(data_network_commit)
 rm(data_network_issue)
-rm(data_network_fork)
 rm(data_network_star)
 rm(data_meta)
 
@@ -177,6 +178,7 @@ summary(m_degree_dv_model)
 
 
 
+# change the outcome variable to atypicality_validation for Fang's metric (for validation purpose)
 
 m_diversity_dv_model = lm(atypicality~
                                   ave_diversity_out +
@@ -190,7 +192,7 @@ m_diversity_dv_model = lm(atypicality~
 vif(m_diversity_dv_model)
 summary(m_diversity_dv_model)
 
-
+# change the outcome variable to atypicality_validation for Fang's metric (for validation purpose)
 m_diversity_degree_dv_model = lm(atypicality~
                                   ave_degree_out +
                                   weakness_out +
@@ -204,7 +206,6 @@ m_diversity_degree_dv_model = lm(atypicality~
                                   ,data = df_project_m_diversity_no_outlier)
 vif(m_diversity_degree_dv_model)
 summary(m_diversity_degree_dv_model)
-
 
 
 
