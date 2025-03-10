@@ -26,8 +26,10 @@ df_project_m = merge(df_project_m, data_validation_awesome_list, by = 'repo_slug
 df_project_m = subset(df_project_m, earliest_commit_year >= 2008 & pk_sim_mean > -999 & earliest_commit_year < 2021)
 
 df_project_m$atypicality = -df_project_m$pk_sim_mean 
+df_project_m$atypicality_validation = - df_project_m$pk_sim_mean_valid
 
 df_project_m_no_outlier = subset(df_project_m, pk_sim_mean > -0.2 & pk_sim_mean < 0.7 
+                                              & atypicality_validation < 2
                                               & owner_star_count_before < exp(7)
                                               & outdegree_commit < exp(5)
                                               & outdegree_issue < exp(3)
@@ -41,7 +43,6 @@ df_project_m_diversity = subset(df_project_m_no_outlier, diversity_commit > -999
 df_project_m_diversity_no_outlier = subset(df_project_m_diversity, diversity_commit < -0.3 &
                                                                    diversity_issue < -0.15 &
                                                                    diversity_star < -0.1)
-df_project_m_diversity_no_outlier$atypicality_validation = - df_project_m_diversity_no_outlier$pk_sim_mean_valid
 # Fang's metric for validation
 rm(data_novelty)
 rm(data_network_commit)
@@ -105,7 +106,7 @@ summary(pca_out_degree)
 
 pca_out_degree$rotation
 df_project_m_diversity_no_outlier$ave_degree_out = - pca_out_degree$x[, 1]
-df_project_m_diversity_no_outlier$weakness_out = - pca_out_degree$x[, 2]
+df_project_m_diversity_no_outlier$weakness_out = pca_out_degree$x[, 2]
 
 
 
@@ -151,7 +152,7 @@ df_project_m_diversity_no_outlier$weakness_diversity = -pca_out_diversity$x[, 2]
 
 ### replicate model I, II, III, and IV in Table 4
 ```{r}
-
+# change the outcome variable to atypicality_validation for Fang's metric (for validation purpose)
 m_degree_all_model = lm(atypicality~
                                   ave_degree_out +
                                   weakness_out +
@@ -164,6 +165,7 @@ m_degree_all_model = lm(atypicality~
 vif(m_degree_all_model)
 summary(m_degree_all_model)
 
+# change the outcome variable to atypicality_validation for Fang's metric (for validation purpose)
 
 m_degree_dv_model = lm(atypicality~
                                   ave_degree_out +
@@ -192,7 +194,6 @@ m_diversity_dv_model = lm(atypicality~
                                   ,data = df_project_m_diversity_no_outlier)
 vif(m_diversity_dv_model)
 summary(m_diversity_dv_model)
-
 # change the outcome variable to atypicality_validation for Fang's metric (for validation purpose)
 m_diversity_degree_dv_model = lm(atypicality~
                                   ave_degree_out +
