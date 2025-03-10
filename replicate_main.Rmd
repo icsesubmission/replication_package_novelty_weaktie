@@ -11,6 +11,7 @@ data_network_issue = read_csv('./data/network_stats_com_Python_before_2022_month
 data_network_star = read_csv('./data/network_stats_com_Python_before_2022_month_12_act_star.csv')
 data_meta = read_csv('./data/repo_meta_com_Python_before_2022.csv')
 data_validation = read_csv('./data/repo_validate_novelty_b_10.csv')
+data_validation_awesome_list = read_csv('./data/repo_property_novelty_awesome_list.csv')
 
 
 
@@ -18,8 +19,9 @@ df_project_m = merge(data_novelty, data_network_commit, by = 'repo_slug')
 df_project_m = merge(df_project_m, data_network_issue, by = 'repo_slug')
 df_project_m = merge(df_project_m, data_network_star, by = 'repo_slug')
 df_project_m = merge(df_project_m, data_validation, by = 'repo_slug')
-
 df_project_m = merge(df_project_m, data_meta, by = 'repo_slug')
+df_project_m = merge(df_project_m, data_validation_awesome_list, by = 'repo_slug')
+
 
 df_project_m = subset(df_project_m, earliest_commit_year >= 2008 & pk_sim_mean > -999 & earliest_commit_year < 2021)
 
@@ -41,7 +43,6 @@ df_project_m_diversity_no_outlier = subset(df_project_m_diversity, diversity_com
                                                                    diversity_star < -0.1)
 df_project_m_diversity_no_outlier$atypicality_validation = - df_project_m_diversity_no_outlier$pk_sim_mean_valid
 # Fang's metric for validation
-
 rm(data_novelty)
 rm(data_network_commit)
 rm(data_network_issue)
@@ -148,7 +149,7 @@ df_project_m_diversity_no_outlier$weakness_diversity = -pca_out_diversity$x[, 2]
 ```
 
 
-### replicate model I, II, III, and IV in Table 5
+### replicate model I, II, III, and IV in Table 4
 ```{r}
 
 m_degree_all_model = lm(atypicality~
@@ -215,7 +216,7 @@ summary(m_diversity_degree_dv_model)
 
 
 
-### generate temp data to replicate Figure 2.a
+### generate temp data to replicate Figure 5.a
 
 
 ```{r}
@@ -262,7 +263,7 @@ write.csv(results_df, "./temp_data/results_diversity_div_sample_yearly_cohort.cs
 ```
 
 
-### visualize figure 2.a
+### visualize figure 5.a
 ```{r}
 
 # Load required libraries
@@ -327,7 +328,7 @@ ggsave(file="./figure/diversity_div_yearly.pdf", width=20, height=9, dpi=300)
 ```
 
 
-### generate temp data to replicate Figure 2.b
+### generate temp data to replicate Figure 5.b
 ```{r}
 # Load necessary libraries
 library(dplyr)
@@ -388,7 +389,7 @@ write.csv(results_df, "./temp_data/results_diversity_div_sample_core_cohort.csv"
 
 
 
-### visualize figure 2.b
+### visualize figure 5.b
 ```{r}
 
 # Load required libraries
@@ -453,7 +454,7 @@ ggsave(file="./figure/diversity_div_sample_core_cohort.pdf", width=20, height=9,
 
 
 
-### generate temp data to replicate Figure 2.c
+### generate temp data to replicate Figure 5.c
 
 ```{r}
 library(dplyr)
@@ -523,7 +524,7 @@ write.csv(results_df, "./temp_data/results_div_org_cohort.csv", row.names = FALS
 
 
 
-### visualize figure 2.c
+### visualize figure 5.c
 ```{r}
 
 # Load required libraries
@@ -583,5 +584,39 @@ ggplot(df_wide, aes(x = owner_type, y = coef, color = Varible)) +
 ggsave(file="./figure/diversity_div_sample_org_cohort.pdf", width=20, height=9, dpi=300)
 
 
+
+```
+
+
+### visualize figure 4
+```{r}
+
+
+awesome_project = subset(df_project_m_diversity_no_outlier, is_awesome == TRUE)
+no_awesome_project = subset(df_project_m_diversity_no_outlier, is_awesome == FALSE)
+t.test(awesome_project$atypicality, no_awesome_project$atypicality) # t-test
+
+
+
+
+ggplot(df_project_m_diversity_no_outlier, aes(x = as.factor(is_awesome), y = atypicality)) +
+  geom_violin() +
+stat_summary(fun.y=mean, geom="point", size=2, color="red")+
+  labs(x = "Whether awesome projects", y = "Atypicality") +
+  # scale_fill_manual(values = c("FALSE" = "blue", "TRUE" = "red")) +
+  theme_minimal() + 
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),  # Adds x and y axis lines
+            axis.title.x = element_text(size = 26),  # Adjust the size of the x-axis title
+    axis.title.y = element_text(size = 26),  # Adjust the size of the y-axis title
+    axis.text.x = element_text(size = 22),   # Adjust the size of the x-axis text
+    axis.text.y = element_text(size = 22)    # Adjust the size of the y-axis text
+            ) +
+  geom_hline(data = df_project_m_diversity_no_outlier %>%
+               group_by(is_awesome) %>%
+               summarise(mean_atypicality = mean(atypicality)),
+             aes(yintercept = mean_atypicality), linetype = "dotted", color = "gray", linewidth = 1.2)
+
+ggsave("./figure/awesome_atypicality.pdf", device = "pdf", width = 7, height = 5)
 
 ```
