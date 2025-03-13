@@ -309,21 +309,22 @@ ggplot(df_wide, aes(x = year, y = coef, color = Varible)) +
   geom_line(size = linewidth) +
   geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.5, size = linewidth) +
   labs(title = "",
-       x = "Year",
+       x = "Year (20XX)",
        y = "Estimated Coefficient",
        color = "Variables") +
     geom_hline(yintercept=0, linetype = 'dashed', color = 'gray', size = linewidth) +
   scale_color_manual(values = c("Average Degree" = "blue", "Average Diversity" = "blue", "Diversity from Weak Tie" = "red", "Degree from Weak Tie" = "red")) +
-  scale_x_continuous(breaks = x_ticks)+
-  theme_classic()+
-  theme(legend.text = element_text(size=26),
-        axis.text.x =element_text(size=28),
-        axis.text.y =element_text(size=28),
-        axis.title.x=element_text(size=28),
-        axis.title.y=element_text(size=28),
-        legend.title=element_text(size=28))
+ scale_x_continuous(breaks = x_ticks, 
+                     labels = function(x) substr(x, 3, 4)) +  # Show last two digits of the year
+  theme_minimal() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.text.x =element_text(size=30),
+        axis.text.y =element_text(size=30),
+        axis.title.x=element_text(size=32),
+        axis.title.y=element_text(size=32))
 
-ggsave(file="./figure/diversity_div_yearly.pdf", width=20, height=9, dpi=300)
+ggsave(file="./figure/diversity_div_yearly.pdf", width=10, height=5, dpi=300)
 
 
 ```
@@ -438,17 +439,16 @@ ggplot(df_wide, aes(x = core_dev_count, y = coef, color = Varible)) +
     geom_hline(yintercept=0, linetype = 'dashed', color = 'gray', size = linewidth) +
   scale_color_manual(values = c("Average Degree" = "blue", "Average Diversity" = "blue", "Diversity from Weak Tie" = "red", "Degree from Weak Tie" = "red")) +
   scale_x_continuous(breaks = x_ticks)+
-  theme_classic()+
-  theme(legend.text = element_text(size=26),
-        axis.text.x =element_text(size=28),
-        axis.text.y =element_text(size=28),
-        axis.title.x=element_text(size=28),
-        axis.title.y=element_text(size=28),
-        legend.title=element_text(size=28))
+  theme_minimal() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.text.x =element_text(size=30),
+        axis.text.y =element_text(size=30),
+        axis.title.x=element_text(size=32),
+        axis.title.y=element_text(size=32))
 
 
-
-ggsave(file="./figure/diversity_div_sample_core_cohort.pdf", width=20, height=9, dpi=300)
+ggsave(file="./figure/diversity_div_sample_core_cohort.pdf", width=10, height=5, dpi=300)
 
 
 ```
@@ -555,8 +555,8 @@ df_wide[df_wide$Varible == "ave_degree_out", "owner_type"] <- df_wide[df_wide$Va
 
 df_wide[df_wide == 'ave_degree_out'] = 'Average Degree'
 df_wide[df_wide == 'ave_diversity_out'] = 'Average Diversity'
-df_wide[df_wide == 'weakness_out'] = 'Degree from Weak Tie'
-df_wide[df_wide == 'weakness_diversity'] = 'Diversity from Weak Tie'
+df_wide[df_wide == 'weakness_out'] = 'Weak Tie Degree'
+df_wide[df_wide == 'weakness_diversity'] = 'Weak Tie Diversity'
 
 
 linewidth = 2
@@ -571,18 +571,19 @@ ggplot(df_wide, aes(x = owner_type, y = coef, color = Varible)) +
        y = "Estimated Coefficient",
        color = "Variables") +
     geom_hline(yintercept=0, linetype = 'dashed', color = 'gray', size = linewidth) +
-  scale_color_manual(values = c("Average Degree" = "blue", "Average Diversity" = "blue", "Diversity from Weak Tie" = "red", "Degree from Weak Tie" = "red")) +
+  scale_color_manual(values = c("Average Degree" = "blue", "Average Diversity" = "blue", "Weak Tie Diversity" = "red", "Weak Tie Degree" = "red")) +
   scale_x_continuous(breaks = x_ticks, labels= c('Org', 'Ind'))+
   theme_classic()+
-  theme(legend.text = element_text(size=26),
-        axis.text.x =element_text(size=28),
-        axis.text.y =element_text(size=28),
-        axis.title.x=element_text(size=28),
-        axis.title.y=element_text(size=28),
-        legend.title=element_text(size=28))
+  theme(panel.grid = element_blank(),
+        legend.text = element_text(size=26),
+        axis.text.x =element_text(size=30),
+        axis.text.y =element_text(size=30),
+        axis.title.x=element_text(size=32),
+        axis.title.y=element_text(size=32),
+        legend.title=element_text(size=32))
 
 
-ggsave(file="./figure/diversity_div_sample_org_cohort.pdf", width=20, height=9, dpi=300)
+ggsave(file="./figure/diversity_div_sample_org_cohort.pdf", width=10, height=5, dpi=300)
 
 
 
@@ -592,11 +593,9 @@ ggsave(file="./figure/diversity_div_sample_org_cohort.pdf", width=20, height=9, 
 ### visualize figure 4
 ```{r}
 
-
 awesome_project = subset(df_project_m_diversity_no_outlier, is_awesome == TRUE)
 no_awesome_project = subset(df_project_m_diversity_no_outlier, is_awesome == FALSE)
 t.test(awesome_project$atypicality, no_awesome_project$atypicality) # t-test
-
 
 
 
