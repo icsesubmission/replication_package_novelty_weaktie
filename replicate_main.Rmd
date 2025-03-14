@@ -573,7 +573,7 @@ ggplot(df_wide, aes(x = owner_type, y = coef, color = Varible)) +
     geom_hline(yintercept=0, linetype = 'dashed', color = 'gray', size = linewidth) +
   scale_color_manual(values = c("Average Degree" = "blue", "Average Diversity" = "blue", "Weak Tie Diversity" = "red", "Weak Tie Degree" = "red")) +
   scale_x_continuous(breaks = x_ticks, labels= c('Org', 'Ind'))+
-  theme_classic()+
+  theme_minimal() + 
   theme(panel.grid = element_blank(),
         legend.text = element_text(size=26),
         axis.text.x =element_text(size=30),
