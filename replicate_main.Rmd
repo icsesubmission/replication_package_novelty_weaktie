@@ -6,7 +6,7 @@ library('corrr')
 library(ggcorrplot)
 library(car)
 
-core_post = '' # ['_eighty', ''] # different core developer identification approach
+core_post = '_eighty' # ['_eighty', ''] # different core developer identification approach
 month_period = '24' # different length of interaction period
 data_novelty = read_csv('./data/repo_property_novelty_com_Python_before_2022_vd_256.csv')
 data_network_commit = read_csv(sprintf('./data/network_stats_com_Python_before_2022_month_%s_act_commit%s.csv', month_period, core_post))
@@ -309,7 +309,7 @@ if (pca_out_diversity$rotation["scaled_diversity_star", 2] < 0) {
 ```
 
 
-### Generate Table 3 using atypicality as outcome, or generate Table 5 using atypicality_validation as outcome
+### Generate Table 3, 6, 7, 8 using atypicality as outcome, or generate Table 5 using atypicality_validation as outcome
 ```{r}
 # change the outcome variable to atypicality_validation for Fang's metric (for validation purpose)
 m_degree_all_model = lm(atypicality~
@@ -755,7 +755,7 @@ df_project_m_diversity_no_outlier = merge(df_project_m_diversity_no_outlier, dat
 
 ```
 
-### visualize Figure 4 and Table 7
+### generate Figure 4 and Table 9
 ```{r}
 
 
